@@ -1,0 +1,9 @@
+requests
+python-dotenv
+google-play-scraper
+app-store-scraper
+streamlit
+anthropic
+supabase
+jinja2
+resend
