@@ -8,19 +8,21 @@ from config import KNOWN_APPS
 load_dotenv()
 
 
-def fetch_signals(product_name: str, competitors: list[str]) -> list[dict]:
+def fetch_reviews(product_name: str, competitors: list[str]) -> list[dict]:
     terms = [product_name] + competitors
     cutoff = datetime.now(timezone.utc) - timedelta(days=7)
-    seen_urls = set()
     results = []
+    seen_urls = set()
 
     for term in terms:
-        try:
-            app_id = KNOWN_APPS.get(term.lower(), {}).get("playstore")
-            if not app_id:
-                print(f"Play Store: no app ID found for '{term}', skipping")
-                continue
+        term = term.lower()
 
+        app_id = KNOWN_APPS.get(term, {}).get("playstore")
+        if not app_id:
+            print(f"No Play Store ID for {term}")
+            continue
+
+        try:
             result, _ = reviews(
                 app_id,
                 lang="en",
@@ -49,8 +51,6 @@ def fetch_signals(product_name: str, competitors: list[str]) -> list[dict]:
                 if len(full_text) < 20:
                     continue
 
-                date_str = at.strftime("%Y-%m-%d")
-
                 results.append({
                     "source": "playstore",
                     "term": term,
@@ -58,12 +58,11 @@ def fetch_signals(product_name: str, competitors: list[str]) -> list[dict]:
                     "title": "",
                     "score": float(review.get("score", 0)),
                     "url": url,
-                    "date": date_str,
+                    "date": at.strftime("%Y-%m-%d"),
                 })
 
         except Exception as e:
             print(f"Play Store error for {term}: {e}")
-            continue
 
         time.sleep(1)
 

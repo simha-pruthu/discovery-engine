@@ -15,7 +15,10 @@ def fetch_signals(product_name: str, competitors: list[str]) -> list[dict]:
 
     for term in terms:
         try:
-            url = f"https://www.reddit.com/search.json?q={term}&sort=new&t=week&limit=100"
+            term_query = f'"{term} app" OR "{term} software" OR "{term} workspace"'
+            subreddit_filter = "subreddit:productivity OR subreddit:saas OR subreddit:projectmanagement OR subreddit:startups"
+            q = f"({term_query}) AND ({subreddit_filter})"
+            url = f"https://www.reddit.com/search.json?q={requests.utils.quote(q)}&sort=new&t=week&limit=100"
             headers = {"User-Agent": os.getenv("REDDIT_USER_AGENT")}
             response = requests.get(url, headers=headers, timeout=10)
             data = response.json()
