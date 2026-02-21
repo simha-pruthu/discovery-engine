@@ -7,15 +7,18 @@ from scrapers.playstore import fetch_reviews
 MAX_SIGNALS = 200
 
 
+# -----------------------------
+# JSON EXTRACTION (STABLE)
+# -----------------------------
 def extract_json(text: str):
     """
     Extract first valid JSON array using bracket balancing.
-    Avoids greedy regex issues and markdown wrappers.
+    Prevents greedy parsing and handles partial text safely.
     """
 
     text = text.strip()
-
     start = text.find("[")
+
     if start == -1:
         raise ValueError("No JSON array found in model output.")
 
@@ -26,7 +29,6 @@ def extract_json(text: str):
             bracket_count += 1
         elif text[i] == "]":
             bracket_count -= 1
-
             if bracket_count == 0:
                 json_str = text[start:i + 1]
                 return json.loads(json_str)
@@ -34,10 +36,13 @@ def extract_json(text: str):
     raise ValueError("Unbalanced JSON array in model output.")
 
 
+# -----------------------------
+# THEME CLUSTERING
+# -----------------------------
 def cluster_themes(signals: list[dict]) -> list[dict]:
     """
     Send signals to Claude Haiku and return ranked themes.
-    Adds priority_score and adjusted_score.
+    Applies polarity weighting to prioritize actionable friction.
     """
 
     api_key = os.getenv("ANTHROPIC_API_KEY")
@@ -47,7 +52,6 @@ def cluster_themes(signals: list[dict]) -> list[dict]:
 
     client = Anthropic(api_key=api_key)
 
-    # Build compact structured input
     lines = []
     for s in signals:
         term = s.get("term", "")
@@ -109,7 +113,6 @@ SIGNALS:
             frequency = theme.get("frequency", 0)
             intensity = theme.get("emotional_intensity", 0)
 
-            # Base priority score
             priority_score = frequency * intensity
             theme["priority_score"] = priority_score
 
@@ -118,7 +121,7 @@ SIGNALS:
             negative_count = sum(combined_quotes.count(word) for word in negative_keywords)
             positive_count = sum(combined_quotes.count(word) for word in positive_keywords)
 
-            # Adjust ranking toward actionable friction
+            # Strong friction prioritization
             if negative_count > positive_count:
                 adjusted_score = priority_score * 1.5
             elif positive_count > negative_count:
@@ -128,7 +131,6 @@ SIGNALS:
 
             theme["adjusted_score"] = adjusted_score
 
-        # Sort by adjusted score descending
         themes.sort(
             key=lambda t: t.get("adjusted_score", 0),
             reverse=True
@@ -146,6 +148,98 @@ SIGNALS:
         return []
 
 
+# -----------------------------
+# BRIEF GENERATION
+# -----------------------------
+def generate_brief(product_name: str, themes: list[dict]) -> str:
+    """
+    Generate a structured weekly discovery brief.
+    Focuses on actionable friction, not generic praise.
+    """
+
+    api_key = os.getenv("ANTHROPIC_API_KEY")
+    if not api_key:
+        print("ANTHROPIC_API_KEY not found.")
+        return ""
+
+    client = Anthropic(api_key=api_key)
+
+    top_themes = themes[:5]
+
+    theme_lines = []
+    for t in top_themes:
+        name = t.get("name", "")
+        frequency = t.get("frequency", 0)
+        intensity = t.get("emotional_intensity", 0)
+        quote = t.get("quotes", [""])[0]
+
+        theme_lines.append(
+            f"- {name} | freq: {frequency} | intensity: {intensity}/10 | example: \"{quote}\""
+        )
+
+    theme_block = "\n".join(theme_lines)
+
+    prompt = f"""
+You are a senior product manager writing a sharp weekly discovery brief.
+
+You are given ranked user themes with frequency and emotional intensity.
+
+Focus on SPECIFIC friction.
+Avoid generic wording like "limitations" or "improvements".
+Use precise language grounded in the quotes.
+Derive opportunity from the most emotionally intense friction.
+
+Return EXACTLY this markdown structure:
+
+# Weekly Discovery Brief — {product_name}
+
+## 🔎 Top 3 Emerging Pain Points
+(Numbered list.
+Each point must include:
+- A precise, specific theme title
+- One sentence explaining concrete user impact
+- One supporting quote.)
+
+---
+
+## 🧩 Opportunity Insight
+(1 sharp strategic opportunity directly derived from the top pain point.
+Be specific and directional.)
+
+---
+
+## 🧪 Suggested Experiment
+(One narrowly scoped hypothesis with a measurable metric.
+Be concrete, not vague.)
+
+---
+
+## 📈 Signal Trend
+(Summarize which friction themes dominate vs praise themes,
+referencing frequency and emotional intensity.
+No generic commentary.)
+
+Themes:
+{theme_block}
+"""
+
+    try:
+        response = client.messages.create(
+            model="claude-3-haiku-20240307",
+            max_tokens=1500,
+            messages=[{"role": "user", "content": prompt}],
+        )
+
+        return response.content[0].text.strip()
+
+    except Exception as e:
+        print("\ngenerate_brief error:", e)
+        return ""
+
+
+# -----------------------------
+# SIGNAL COLLECTION
+# -----------------------------
 def collect_signals(product_name: str, competitors: list[str]) -> list[dict]:
     """
     Collect signals from Reddit + Play Store,
@@ -171,7 +265,6 @@ def collect_signals(product_name: str, competitors: list[str]) -> list[dict]:
 
     total_after_dedupe = len(deduped)
 
-    # Sort by review score descending
     deduped.sort(key=lambda s: s.get("score", 0.0), reverse=True)
 
     final = deduped[:MAX_SIGNALS]
