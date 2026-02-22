@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Briefed | Discovery Workspace</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="app">
+
+    <header class="topbar">
+        <div class="brand">Briefed</div>
+        <div class="subtitle">Strategic Discovery Workspace</div>
+    </header>
+
+    <main class="workspace">
+
+        <section class="input-panel">
+            <h2>New Discovery</h2>
+
+            <label>Company Name</label>
+            <input type="text" id="companyInput" placeholder="Enter company name">
+
+            <label>Competitors</label>
+            <div id="competitorContainer">
+                <input type="text" class="competitorInput" placeholder="Enter competitor name">
+            </div>
+
+            <button class="add-btn" onclick="addCompetitor()">+ Add Competitor</button>
+
+            <button class="generate-btn" onclick="generateDiscovery()">
+                Generate Analysis
+            </button>
+        </section>
+
+        <section class="output-panel">
+            <div class="output-placeholder">
+                Your structured discovery will appear here.
+            </div>
+        </section>
+
+    </main>
+
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
