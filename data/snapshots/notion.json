@@ -1,0 +1,40 @@
+[
+  {
+    "timestamp": "2026-02-22T00:05:15.488860",
+    "total_signals": 57,
+    "negative_rate": 28.1,
+    "themes": [
+      {
+        "name": "Notion Usability Issues",
+        "frequency": 8,
+        "impact_score": 7.1
+      },
+      {
+        "name": "Reliability Issues",
+        "frequency": 6,
+        "impact_score": 6.0
+      },
+      {
+        "name": "Unwanted AI Features",
+        "frequency": 5,
+        "impact_score": 5.45
+      },
+      {
+        "name": "Perceived Complexity",
+        "frequency": 5,
+        "impact_score": 5.15
+      },
+      {
+        "name": "Lack of Customization",
+        "frequency": 4,
+        "impact_score": 4.6
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-22T00:17:17.448398",
+    "total_signals": 57,
+    "negative_rate": 0.0,
+    "themes": []
+  }
+]

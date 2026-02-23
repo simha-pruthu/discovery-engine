@@ -1,0 +1,236 @@
+/* Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════════════════════
+   DESIGN TOKENS — STRONGER CONTRAST
+═══════════════════════════════════════════════════════════════ */
+:root {
+
+  --bg-main:   #F8F5F0;
+  --bg-alt-1:  #FFFFFF;
+  --bg-alt-2:  #F2EDE4;
+
+  --bg-dark:   #11110F;     /* darker */
+  --bg-dark-2: #171714;
+
+  /* STRONGER INK */
+  --ink:   #11110F;
+  --ink-2: #1F1E1A;
+  --ink-3: #3F3C34;
+  --ink-4: #6C6558;
+
+  --border-soft:   #E6DFD1;
+  --border-medium: #CFC5B2;
+
+  --sage:    #2A5C3F;
+  --sage-2:  #3E7A57;
+  --sage-3:  #62A07A;
+
+  --pad: 80px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BASE — STRONGER WEIGHT
+═══════════════════════════════════════════════════════════════ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html, body {
+  background: var(--bg-main);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;     /* WAS TOO LIGHT */
+  letter-spacing: 0.01em;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DISPLAY SCALE — PROMINENT BUT ELEGANT
+═══════════════════════════════════════════════════════════════ */
+
+.display-xl,
+.display-lg,
+.display-md,
+.pull-quote {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 500;     /* stronger */
+  color: var(--ink);
+}
+
+.display-xl {
+  font-size: clamp(52px, 7vw, 88px);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+}
+
+.display-lg {
+  font-size: clamp(40px, 5.5vw, 64px);
+  line-height: 1.1;
+}
+
+.display-md {
+  font-size: clamp(22px, 2.5vw, 32px);
+  line-height: 1.25;
+}
+
+.pull-quote {
+  font-size: clamp(22px, 2.8vw, 28px);
+  font-style: italic;
+  line-height: 1.6;
+}
+
+/* BODY TEXT — FIXED VISIBILITY */
+.body-text {
+  font-size: 17px;
+  font-weight: 500;      /* stronger */
+  line-height: 1.75;
+  color: var(--ink-3);
+}
+
+/* MICRO LABEL — readable */
+.micro {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+/* HIGHLIGHT */
+.highlight {
+  color: var(--sage);
+  font-style: italic;
+  position: relative;
+}
+.highlight::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 3px;
+  width: 100%;
+  height: 6px;
+  background: rgba(42,92,63,.12);
+  z-index: -1;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   NAV
+═══════════════════════════════════════════════════════════════ */
+.nav-glass {
+  background: rgba(248, 245, 240, 0.96) !important;
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTION NUMBER
+═══════════════════════════════════════════════════════════════ */
+.section-number {
+  position: absolute;
+  right: var(--pad);
+  bottom: 48px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 200px;
+  font-weight: 500;
+  font-style: italic;
+  opacity: 0.06;
+  pointer-events: none;
+  user-select: none;
+  color: var(--ink);
+}
+
+.section-number-light {
+  color: rgba(255,255,255,.08);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   INTELLIGENCE CARD
+═══════════════════════════════════════════════════════════════ */
+.mask-fade {
+  mask-image: linear-gradient(to bottom, black 65%, transparent 100%);
+}
+
+.card-tilt {
+  transform: perspective(1200px) rotateY(-2deg) rotateX(1deg);
+  transition: transform .4s ease, box-shadow .4s ease;
+}
+.card-tilt:hover {
+  transform: perspective(1200px) rotateY(0deg) rotateX(0deg) translateY(-4px);
+  box-shadow: 0 24px 60px rgba(0,0,0,.08);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   METRICS — STRONGER PRESENCE
+═══════════════════════════════════════════════════════════════ */
+.cred-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 44px;
+  font-weight: 600;   /* stronger */
+  font-style: italic;
+  color: var(--ink);
+}
+
+/* DARK BAND — FIXED PROPERLY */
+.metric-cell-dark {
+  padding: 36px var(--pad);
+  background: var(--bg-dark);   /* force background */
+  border-right: 1px solid rgba(255,255,255,.08);
+}
+
+.metric-val-dark {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 48px;
+  font-weight: 600;
+  font-style: italic;
+  color: #F4F2EC;   /* softer than pure white */
+}
+
+.metric-val-dark.sage {
+  color: var(--sage-3);
+}
+
+/* Ensure dark band text readable */
+.metric-cell-dark * {
+  color: #F4F2EC;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════════════════════════ */
+.cta-button {
+  background: var(--ink);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 14px 28px;
+  border-radius: 6px;
+  transition: all .25s ease;
+}
+.cta-button:hover {
+  background: var(--sage);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0,0,0,.12);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SCROLL REVEAL
+═══════════════════════════════════════════════════════════════ */
+.reveal-init {
+  opacity: 0;
+  transform: translateY(18px);
+}
+.reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity .6s ease, transform .6s ease;
+}
