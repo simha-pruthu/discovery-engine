@@ -13,79 +13,85 @@ export default function Navbar() {
   return (
     <nav
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        scrolled ? "nav-glass" : "bg-transparent border-b border-transparent"
+        scrolled ? "nav-glass" : ""
       }`}
+      style={{
+        height: 56,
+        display: "flex",
+        alignItems: "center",
+        padding: "0 var(--pad)",
+        borderBottom: scrolled ? undefined : "1px solid transparent",
+      }}
     >
       <div
-        className="flex items-center justify-between"
-        style={{ padding: "0 var(--pad)", height: "56px" }}
+        style={{
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 24,
+        }}
       >
         {/* Logo */}
-        <div
-          className="font-serif text-xl"
+        <a
+          href="/"
           style={{
             fontFamily: "'Cormorant Garamond', serif",
-            fontWeight: 400,
+            fontSize: 20,
+            fontWeight: 500,
             letterSpacing: "-0.02em",
             color: "var(--ink)",
+            textDecoration: "none",
+            flexShrink: 0,
           }}
         >
-          Brie
-          <span style={{ color: "var(--sage)" }}>fd</span>
-        </div>
+          Brie<span style={{ color: "var(--sage)" }}>fd</span>
+        </a>
 
-        {/* Center anchors */}
-        <div className="flex items-center gap-8">
+        {/* Center section anchors */}
+        <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
           {[
-            { label: "Intelligence", href: "#signal" },
-            { label: "Numbers",     href: "#numbers" },
-            { label: "Direction",   href: "#hypothesis" },
+            { label: "Intelligence", href: "#signal"     },
+            { label: "Numbers",      href: "#numbers"    },
+            { label: "Direction",    href: "#hypothesis" },
           ].map(({ label, href }) => (
             <a
               key={href}
               href={href}
-              className="micro transition-colors duration-200 hover:text-[var(--ink)]"
-              style={{ color: "var(--ink-4)" }}
+              className="nav-link"
+              style={{ textDecoration: "none" }}
             >
               {label}
             </a>
           ))}
         </div>
 
-        {/* Right side */}
-        <div className="flex items-center gap-5">
-          {/* Live pip — personality touch */}
-          <span
-            className="flex items-center gap-2"
+        {/* Right: live pip + CTA */}
+        <div style={{ display: "flex", alignItems: "center", gap: 18, flexShrink: 0 }}>
+          <span className="live-pip">Live</span>
+
+          {/*
+           * Using <a> as button — must override ALL Tailwind link styles.
+           * textDecoration: none is set both in CSS (.cta-button) and inline
+           * to defeat Tailwind's base layer <a> rule.
+           */}
+          <a
+            href="/experience"
+            className="cta-button"
             style={{
-              fontSize: "10px",
-              fontWeight: 600,
-              letterSpacing: "0.15em",
-              textTransform: "uppercase",
-              color: "var(--sage)",
+              textDecoration: "none",
+              padding: "9px 18px",
+              fontSize: "12px",
+              borderRadius: "6px",    /* explicit — no pill */
             }}
           >
-            <span
-              style={{
-                width: 5,
-                height: 5,
-                borderRadius: "50%",
-                background: "var(--sage)",
-                display: "inline-block",
-                animation: "pip 2.6s ease infinite",
-              }}
-            />
-            Live
-          </span>
-
-          <a href="/experience" className="cta-button" style={{ padding: "8px 18px", fontSize: "12px" }}>
             Request Access
           </a>
         </div>
       </div>
 
       <style jsx>{`
-        @keyframes pip {
+        @keyframes blink {
           0%, 100% { opacity: 1; }
           50%       { opacity: 0.15; }
         }

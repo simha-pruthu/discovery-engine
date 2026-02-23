@@ -196,7 +196,7 @@ function InputBand({
             justifyContent: "center",
           }}
         >
-          {loading ? "Analyzing live signals…" : "Run Analysis →"}
+          {loading ? "Pulling signals…" : "Run Analysis →"}
         </button>
       </div>
     </div>
@@ -228,12 +228,7 @@ function ThemeBlock({ theme, index }: { theme: Theme; index: number }) {
           {theme.name}
         </div>
         {[
-          {
-            k: "Frequency",
-            v: <span><strong style={{fontWeight:500, color:"var(--ink-strong)"}}>
-                  {theme.frequency}
-                </strong> mentions</span>
-          },
+          { k: "Frequency",  v: `${theme.frequency} mentions` },
           { k: "Segment",    v: theme.primary_segment },
           { k: "Intensity",  v: theme.emotional_intensity },
         ].map(({ k, v }) => (
@@ -305,20 +300,40 @@ function CompBlock({ name, negRate, shared, uniqueP, uniqueC }: { name: string; 
 function HypCard({ index, theme }: { index: number; theme: Theme }) {
   const { ref, visible } = useScrollReveal({ threshold: 0.05 });
   return (
-    <div ref={ref} className={`transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}`}
-      style={{ display: "grid", gridTemplateColumns: "96px 1fr", gap: 36, padding: "36px 0", borderBottom: "1px solid rgba(255,255,255,.06)", alignItems: "start" }}>
-      <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 64, fontWeight: 300, fontStyle: "italic", color: "rgba(255,255,255,.08)", lineHeight: 1, letterSpacing: "-4px", paddingTop: 4 }}>
+    <div
+      ref={ref}
+      className={`hyp-card-row transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}`}
+      style={{ display: "grid", gridTemplateColumns: "80px 1fr", gap: 36, alignItems: "start" }}
+    >
+      {/* Index number — visible, not ghosted */}
+      <div className="hyp-index">
         {String(index + 1).padStart(2, "0")}
       </div>
+
       <div>
-        <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 20, fontWeight: 300, color: "rgba(255,255,255,.9)", lineHeight: 1.5, letterSpacing: "-0.02em", marginBottom: 22 }}>
-          If we improve <em style={{ fontStyle: "italic", color: "var(--sage-3)" }}>{theme.name}</em>, we expect measurable gains in retention among the {theme.primary_segment} segment.
+        {/* Statement — prominent */}
+        <div className="hyp-text" style={{ marginBottom: 22 }}>
+          If we improve{" "}
+          <em style={{ fontStyle: "italic", color: "#62A07A" }}>{theme.name}</em>
+          , we expect measurable gains in retention among the{" "}
+          <strong style={{ fontWeight: 500 }}>{theme.primary_segment}</strong> segment.
         </div>
+
+        {/* Metadata row */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }}>
-          {[["Primary Metric","CSAT · Retention Rate"],["Expected Change","+8–12% in segment"],["Sprint","4–6 weeks"]].map(([l,v]) => (
+          {[
+            ["Primary Metric",   "CSAT · Retention Rate"],
+            ["Expected Change",  "+8–12% in segment"],
+            ["Suggested Sprint", "4–6 weeks"],
+          ].map(([l, v]) => (
             <div key={l}>
-              <div className="micro" style={{ color: "rgba(255,255,255,.3)", marginBottom: 5 }}>{l}</div>
-              <div style={{ fontSize: 13, fontWeight: 300, color: "rgba(255,255,255,.6)" }}>{v}</div>
+              <div className="micro" style={{ marginBottom: 5 }}>{l}</div>
+              <div style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: 13,
+                fontWeight: 400,
+                color: "rgba(232,240,236,0.7)",
+              }}>{v}</div>
             </div>
           ))}
         </div>
@@ -564,27 +579,29 @@ export default function ExperiencePage() {
       {/* Results — only rendered after analysis */}
       {d && (
         <>
-          {/* Metrics band */}
+          {/* Metrics band — warm stone, light but distinct */}
           <div
+            className="metrics-band"
             style={{
-              display: "grid",
               gridTemplateColumns: `repeat(${compNames.length ? 5 : 4}, 1fr)`,
-              background: "var(--dark)",
             }}
           >
             {[
-              { label: "Analysing",     value: lastKey.split("|")[0],                   accent: true },
-              { label: "Total Signals", value: String(d.product.summary.total_signals) },
+              { label: "Analysing",     value: lastKey.split("|")[0],                    accent: true },
+              { label: "Total Signals", value: String(d.product.summary.total_signals)  },
               { label: "Negative Rate", value: `${d.product.summary.negative_rate.toFixed(1)}%`, sage: true },
-              { label: "Themes",        value: String(themes.length) },
+              { label: "Themes",        value: String(themes.length)                    },
               ...(compNames.length ? [{ label: "Competitors", value: String(compNames.length) }] : []),
             ].map(({ label, value, accent, sage }) => (
-              <div key={label} className="metric-cell-dark">
-                {accent && <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1.5, background: "var(--sage-2)" }} />}
-                <div className="micro" style={{ color: "rgba(255,255,255,.3)", marginBottom: 12 }}>{label}</div>
-                <div className={`metric-val-dark${sage ? " sage" : ""}`} style={label === "Analysing" ? { fontSize: 28 } : {}}>
+              <div key={label} className="metric-cell">
+                <div className="micro">{label}</div>
+                <div className={`metric-val${sage ? " sage" : ""}`}
+                  style={label === "Analysing" ? { fontSize: "clamp(20px,2.5vw,28px)" } : {}}>
                   {value}
                 </div>
+                {label === "Total Signals" && <span className="metric-sub">captured</span>}
+                {label === "Negative Rate" && <span className="metric-sub">of all signals</span>}
+                {label === "Themes"        && <span className="metric-sub">identified</span>}
               </div>
             ))}
           </div>
@@ -627,53 +644,62 @@ export default function ExperiencePage() {
             </>
           )}
 
-          {/* 03 — Hypothesis (dark) */}
+          {/* 03 — Hypothesis Lab — forest green, all text forced visible via hyp-section CSS class */}
           <div
             id="hypothesis"
+            className="hyp-section"
             style={{
-              background: "var(--dark)",
-              padding: "52px var(--pad) 0",
+              padding: "52px var(--pad) 48px",
               position: "relative",
               overflow: "hidden",
             }}
           >
-            <div
-              aria-hidden="true"
-              style={{
-                position: "absolute", right: "var(--pad)", bottom: 0,
-                fontFamily: "'Cormorant Garamond', serif",
-                fontSize: 200, fontWeight: 300, fontStyle: "italic",
-                color: "rgba(255,255,255,.03)", lineHeight: 1,
-                pointerEvents: "none", letterSpacing: -8,
-              }}
-            >
+            {/* Decorative section number */}
+            <div className="section-number section-number-light" aria-hidden="true">
               {compNames.length ? "03" : "02"}
             </div>
 
             <div style={{ position: "relative", zIndex: 1 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 24 }}>
-                <div style={{ width: 24, height: 1, background: "var(--sage-2)" }} />
-                <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--sage-2)" }}>
-                  Hypothesis Lab
-                </span>
+              <div className="kicker" style={{ marginBottom: 24 }}>
+                Hypothesis Lab
               </div>
-              <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "clamp(36px,5vw,56px)", fontWeight: 300, fontStyle: "italic", color: "white", lineHeight: 1.06, letterSpacing: "-0.03em", marginBottom: 12 }}>
+
+              <h2
+                className="display-lg"
+                style={{ marginBottom: 16, fontStyle: "italic" }}
+              >
                 Signal becomes direction.
               </h2>
-              <p style={{ fontSize: 15, fontWeight: 300, color: "rgba(255,255,255,.4)", lineHeight: 1.75, maxWidth: 440, marginBottom: 36 }}>
+
+              <p className="body-text" style={{ maxWidth: 440, marginBottom: 36 }}>
                 Structured hypotheses generated from your top themes.
                 Use as starting points, not conclusions.
               </p>
 
               <button
                 onClick={() => setHypOpen(!hypOpen)}
-                style={{ background: "none", border: "1px solid rgba(255,255,255,.14)", borderRadius: 6, cursor: "pointer", padding: "10px 20px", fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,.6)", display: "flex", alignItems: "center", gap: 8, marginBottom: 32 }}
+                style={{
+                  background: "transparent",
+                  border: "1px solid rgba(232,240,236,0.2)",
+                  borderRadius: 6,
+                  cursor: "pointer",
+                  padding: "10px 20px",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: "rgba(232,240,236,0.7)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  marginBottom: 32,
+                  fontFamily: "'DM Sans', sans-serif",
+                  letterSpacing: "0.04em",
+                }}
               >
                 {hypOpen ? "▾ Close Lab" : "▸ Open Hypothesis Lab"}
               </button>
 
               {hypOpen && (
-                <div style={{ paddingBottom: 52 }}>
+                <div>
                   {themes.slice(0, 5).map((t, i) => <HypCard key={i} index={i} theme={t} />)}
                 </div>
               )}

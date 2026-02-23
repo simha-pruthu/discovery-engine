@@ -1,16 +1,16 @@
 "use client";
 import useScrollReveal from "@/src/hooks/useScrollReveal";
-import { ReactNode } from "react";
+import { ReactNode, CSSProperties } from "react";
 
 interface SectionProps {
-  id: string;
+  id?: string;
   number: string;
-  background: string;
+  background?: string;
   children: ReactNode;
-  dark?: boolean;            // inverts section number color
-  noPad?: boolean;           // skip default top padding (for metric bands)
-  fullBleed?: boolean;       // children fill full width
-  minHeight?: string;
+  hypothesis?: boolean;   // deep forest green section
+  noPad?: boolean;
+  fullBleed?: boolean;
+  style?: CSSProperties;
 }
 
 export default function Section({
@@ -18,48 +18,50 @@ export default function Section({
   number,
   background,
   children,
-  dark = false,
+  hypothesis = false,
   noPad = false,
   fullBleed = false,
-  minHeight = "min-h-screen",
+  style,
 }: SectionProps) {
   const { ref, visible } = useScrollReveal({ threshold: 0.06 });
 
   return (
     <section
       id={id}
-      className={`relative ${minHeight} overflow-hidden`}
-      style={{ background }}
+      /*
+       * NO min-h-screen — was creating giant empty gaps.
+       * overflow:hidden clips section-number so it never adds height.
+       * hyp-section class uses hex directly in CSS (CSS vars don't
+       * resolve reliably as inline style strings in JSX).
+       */
+      className={`relative overflow-hidden ${hypothesis ? "hyp-section" : ""}`}
+      style={{
+        background: hypothesis ? undefined : background,
+        ...style,
+      }}
     >
-      {/* Section content */}
       <div
         ref={ref}
-        className={`
-          ${fullBleed ? "w-full" : ""}
-          transition-all duration-700 ease-out
-          ${visible
-            ? "opacity-100 translate-y-0"
-            : "opacity-0 translate-y-5"
-          }
-        `}
+        className={`transition-all duration-700 ease-out ${
+          visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
+        }`}
         style={
           fullBleed
             ? {}
             : {
-                paddingTop: noPad ? 0 : "clamp(72px, 8vh, 112px)",
-                paddingBottom: noPad ? 0 : "clamp(72px, 8vh, 112px)",
-                paddingLeft: "var(--pad)",
-                paddingRight: "var(--pad)",
-                maxWidth: "none",
+                paddingTop:    noPad ? 0 : "clamp(56px, 7vh, 96px)",
+                paddingBottom: noPad ? 0 : "clamp(56px, 7vh, 96px)",
+                paddingLeft:   "var(--pad)",
+                paddingRight:  "var(--pad)",
               }
         }
       >
         {children}
       </div>
 
-      {/* Section number — bottom-right, always */}
+      {/* Section number — bottom-right always, decorative */}
       <div
-        className={`section-number ${dark ? "section-number-light" : ""}`}
+        className={`section-number ${hypothesis ? "section-number-light" : ""}`}
         aria-hidden="true"
       >
         {number}

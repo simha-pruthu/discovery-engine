@@ -140,29 +140,29 @@ function MetricsBand({
       style={{
         display: "grid",
         gridTemplateColumns: `repeat(${cells.length}, 1fr)`,
-        background: "var(--dark)",
+        background: "#EAE4D8",
       }}
     >
       {cells.map(({ label, value, unit, accent, sage }) => (
-        <div key={label} className="metric-cell-dark">
+        <div key={label} className="metric-cell">
           {accent && (
             <div
               style={{
                 position: "absolute",
                 top: 0, left: 0, right: 0,
                 height: 1.5,
-                background: "var(--sage-2)",
+                background: "#3E7A57",
               }}
             />
           )}
           <div
             className="micro"
-            style={{ color: "rgba(255,255,255,.3)", marginBottom: 12 }}
+            style={{ color: "#7A7267", marginBottom: 12 }}
           >
             {label}
           </div>
           <div
-            className={`metric-val-dark ${sage ? "sage" : ""}`}
+            className={`metric-val ${sage ? "sage" : ""}`}
             style={
               label === "Analysing"
                 ? { fontSize: 30, letterSpacing: "-0.02em" }
@@ -178,7 +178,7 @@ function MetricsBand({
             style={{
               fontSize: 11,
               fontWeight: 300,
-              color: "rgba(255,255,255,.26)",
+              color: "#7A7267",
               marginTop: 8,
             }}
           >
@@ -552,7 +552,7 @@ function HypothesisCard({
             <div key={label}>
               <div
                 className="micro"
-                style={{ color: "rgba(255,255,255,.3)", marginBottom: 5 }}
+                style={{ color: "#7A7267", marginBottom: 5 }}
               >
                 {label}
               </div>
@@ -677,15 +677,7 @@ export default function Home() {
             style={{ display: "flex", alignItems: "center", gap: 22 }}
           >
             <a href="/experience" className="cta-button">
-              Experience Briefd →
-            </a>
-
-            <a
-              href="/experience"
-              className="cta-button-ghost"
-              style={{ padding: "12px 24px", fontSize: 12 }}
-            >
-              Try Live Demo
+              Run Intelligence →
             </a>
             <span
               style={{
@@ -908,8 +900,7 @@ export default function Home() {
       <Section
         id="hypothesis"
         number="05"
-        background="var(--bg-dark)"
-        dark
+        hypothesis
       >
         {/* Dark kicker */}
         <div
@@ -920,7 +911,7 @@ export default function Home() {
             marginBottom: 28,
           }}
         >
-          <div style={{ width: 28, height: 1, background: "var(--sage-2)" }} />
+          <div style={{ width: 28, height: 1, background: "#3E7A57" }} />
           <span
             style={{
               fontSize: 10,
@@ -953,7 +944,7 @@ export default function Home() {
           style={{
             fontSize: 17,
             fontWeight: 300,
-            color: "rgba(255,255,255,.4)",
+            color: "#4C4840",
             lineHeight: 1.75,
             maxWidth: 480,
             marginBottom: 56,
@@ -985,7 +976,7 @@ export default function Home() {
             style={{
               fontSize: 12,
               fontWeight: 300,
-              color: "rgba(255,255,255,.28)",
+              color: "#7A7267",
               fontStyle: "italic",
             }}
           >
