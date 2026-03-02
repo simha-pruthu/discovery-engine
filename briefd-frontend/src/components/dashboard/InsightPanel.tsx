@@ -497,85 +497,107 @@ export default function InsightPanel({
     }
   }
 
-  return (
-    <div className="bg-white border border-[#E2E8F0] rounded-xl p-8 shadow-sm md:sticky md:top-24 self-start">
-      <h2 className="text-xs uppercase tracking-wider text-[#64748B] font-medium mb-6">
-        Executive Summary
-      </h2>
+  const dividerStyle = { borderTop: "1px solid var(--border)", paddingTop: 20, marginTop: 20 };
+  const labelStyle = {
+    fontFamily: "'DM Sans', sans-serif",
+    fontSize: "0.68rem",
+    fontWeight: 500 as const,
+    textTransform: "uppercase" as const,
+    letterSpacing: "0.12em",
+    color: "var(--ink-faint)",
+    marginBottom: 12,
+    display: "block",
+  };
 
-      <p className="text-sm text-[#64748B] leading-relaxed mb-6">
-        <span className="text-[#0F172A] font-semibold tabular-nums">
+  return (
+    <div
+      className="float-card"
+      style={{ padding: 28 }}
+    >
+      <span style={labelStyle}>Executive Summary</span>
+
+      <p className="body-copy" style={{ marginBottom: 0 }}>
+        <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, color: "var(--ink)", fontSize: "1rem" }}>
           {summary.total_signals.toLocaleString()}
         </span>{" "}
         signals analyzed.{" "}
-        <span className="text-[#0F172A] font-semibold">
+        <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, color: "var(--orange)", fontSize: "1rem" }}>
           {Math.round(summary.negative_rate)}%
         </span>{" "}
         classified as negative sentiment.
       </p>
 
       {/* Top risk theme */}
-      <div className="pt-5 border-t border-[#E2E8F0] mb-5">
-        <p className="text-xs uppercase tracking-wider text-[#64748B] font-medium mb-3">
-          Top Risk Theme
+      <div style={dividerStyle}>
+        <span style={labelStyle}>Top Risk Theme</span>
+        <p className="card-heading" style={{ fontSize: "0.95rem", marginBottom: 4 }}>
+          {topTheme?.name}
         </p>
-        <p className="text-sm font-semibold text-[#0F172A]">{topTheme?.name}</p>
-        <p className="text-xs text-[#64748B] mt-1">
-          {topTheme?.primary_segment} &middot;{" "}
-          {topTheme?.frequency.toLocaleString()} signals
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.75rem", color: "var(--ink-faint)" }}>
+          {topTheme?.primary_segment} · {topTheme?.frequency.toLocaleString()} signals
         </p>
       </div>
 
       {/* Trend */}
-      <div className="pt-5 border-t border-[#E2E8F0] mb-6">
-        <p className="text-xs uppercase tracking-wider text-[#64748B] font-medium mb-2">
-          Trend
-        </p>
-        <div className="flex items-center gap-2">
+      <div style={dividerStyle}>
+        <span style={labelStyle}>Trend</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span
-            className={`w-2 h-2 rounded-full shrink-0 ${
-              improving ? "bg-emerald-500" : "bg-[#D14E17]"
-            }`}
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: "50%",
+              background: improving ? "#22c55e" : "var(--orange)",
+              flexShrink: 0,
+            }}
           />
           <span
-            className={`text-sm font-medium ${
-              improving ? "text-emerald-700" : "text-[#D14E17]"
-            }`}
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: "0.85rem",
+              fontWeight: 500,
+              color: improving ? "#16a34a" : "var(--orange)",
+            }}
           >
             {improving ? "Improving" : "Worsening"}
           </span>
         </div>
       </div>
 
-      {/* Downloads */}
-      <div className="pt-5 border-t border-[#E2E8F0] space-y-3">
-        <p className="text-xs uppercase tracking-wider text-[#64748B] font-medium mb-4">
-          Export
-        </p>
-
-        <div>
+      {/* Export */}
+      <div style={dividerStyle}>
+        <span style={labelStyle}>Export</span>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <button
             onClick={() => downloadRawFeedback(themes)}
-            className="w-full px-4 py-2.5 border border-[#E2E8F0] bg-white text-[#0F172A] rounded-lg text-sm font-medium hover:bg-[#F8F9FA] hover:border-slate-300 transition"
+            style={{
+              width: "100%",
+              padding: "10px 16px",
+              border: "1px solid var(--border)",
+              borderRadius: 8,
+              background: "var(--white)",
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: "0.82rem",
+              fontWeight: 500,
+              color: "var(--ink)",
+              cursor: "pointer",
+              transition: "background 0.2s",
+              textAlign: "left",
+            }}
+            onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "var(--card-bg)")}
+            onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "var(--white)")}
           >
             Download Raw Feedback
           </button>
-          <p className="text-xs text-[#A0AEC0] mt-1.5 px-1">
-            Unprocessed signals as CSV.
-          </p>
-        </div>
 
-        <div>
           <button
             onClick={handleDownloadReport}
             disabled={downloading}
-            className="w-full px-4 py-2.5 bg-[#D14E17] text-white rounded-lg text-sm font-medium hover:opacity-90 transition disabled:opacity-60 disabled:cursor-not-allowed"
+            className="btn-primary"
+            style={{ width: "100%", justifyContent: "center" }}
           >
-            {downloading ? "Generating PDF…" : "Download Analysis Report"}
+            {downloading ? "Generating PDF…" : "Download Report"}
           </button>
-          <p className="text-xs text-[#A0AEC0] mt-1.5 px-1">
-            Themes, intensity, and hypotheses as PDF.
-          </p>
         </div>
       </div>
     </div>

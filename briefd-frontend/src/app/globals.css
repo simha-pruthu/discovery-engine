@@ -2,34 +2,362 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Design Tokens ─────────────────────────────────────────────────────── */
+:root {
+  --bg:        #F7F4EF;
+  --ink:       #111110;
+  --ink-mid:   #555450;
+  --ink-faint: #A8A5A0;
+  --orange:    #E84F27;
+  --card-bg:   #F0EDE7;
+  --border:    #E0DDD7;
+  --white:     #FDFCFB;
+}
+
+/* ─── Base ───────────────────────────────────────────────────────────────── */
 html {
   scroll-behavior: smooth;
 }
 
 body {
-  background-color: #ffffff;
+  background-color: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 ::selection {
-  background: #FDF4EE;
+  background: rgba(232, 79, 39, 0.12);
 }
 
-@keyframes livePulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.35; }
+/* ─── Typography helpers ────────────────────────────────────────────────── */
+.font-display {
+  font-family: var(--font-fraunces, 'Fraunces', Georgia, serif);
 }
 
-.live-pulse {
-  animation: livePulse 2s ease-in-out infinite;
+.hero-display {
+  font-family: var(--font-fraunces, 'Fraunces', Georgia, serif);
+  font-size: clamp(3rem, 6vw, 5.5rem);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  color: var(--ink);
 }
 
-.fade-up-init {
-  opacity: 0;
-  transform: translateY(18px);
-  transition: opacity 0.55s ease, transform 0.55s ease;
+.section-heading {
+  font-family: var(--font-fraunces, 'Fraunces', Georgia, serif);
+  font-size: clamp(2rem, 3.5vw, 3rem);
+  font-weight: 300;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  color: var(--ink);
 }
 
-.fade-up-show {
-  opacity: 1;
-  transform: translateY(0);
+.card-heading {
+  font-family: var(--font-fraunces, 'Fraunces', Georgia, serif);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.eyebrow {
+  font-family: var(--font-dm-sans, 'DM Sans', sans-serif);
+  font-size: 0.72rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink-faint);
+}
+
+.body-copy {
+  font-family: var(--font-dm-sans, 'DM Sans', sans-serif);
+  font-size: 0.875rem;
+  font-weight: 300;
+  line-height: 1.75;
+  color: var(--ink-mid);
+}
+
+.metric-display {
+  font-family: var(--font-fraunces, 'Fraunces', Georgia, serif);
+  font-size: 3.5rem;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: var(--orange);
+}
+
+/* ─── Layout ────────────────────────────────────────────────────────────── */
+.container-site {
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 60px;
+  padding-right: 60px;
+}
+
+@media (max-width: 768px) {
+  .container-site {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+.section-py {
+  padding-top: 100px;
+  padding-bottom: 100px;
+}
+
+@media (max-width: 768px) {
+  .section-py {
+    padding-top: 60px;
+    padding-bottom: 60px;
+  }
+}
+
+/* ─── 1px border grid technique ─────────────────────────────────────────── */
+/* Set .border-grid background to var(--border), children get var(--bg).
+   gap: 1px creates precise architectural dividers. */
+.border-grid {
+  background: var(--border);
+  gap: 1px;
+}
+
+.border-grid > * {
+  background: var(--bg);
+}
+
+.border-grid-white > * {
+  background: var(--white);
+}
+
+/* ─── Eyebrow with orange dash ──────────────────────────────────────────── */
+.eyebrow-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.eyebrow-dash {
+  display: inline-block;
+  width: 28px;
+  height: 1px;
+  background: var(--orange);
+  flex-shrink: 0;
+}
+
+/* ─── Buttons ────────────────────────────────────────────────────────────── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 28px;
+  background: var(--orange);
+  color: var(--white);
+  font-family: var(--font-dm-sans, 'DM Sans', sans-serif);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 100px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(232, 79, 39, 0.28);
+  transition: box-shadow 0.25s, transform 0.25s;
+  text-decoration: none;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 8px 28px rgba(232, 79, 39, 0.38);
+  transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+  background: var(--border);
+  color: var(--ink-faint);
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-ink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: var(--ink);
+  color: var(--bg);
+  font-family: var(--font-dm-sans, 'DM Sans', sans-serif);
+  font-size: 0.82rem;
+  font-weight: 500;
+  border-radius: 100px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  text-decoration: none;
+}
+
+.btn-ink:hover {
+  background: var(--orange);
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--font-dm-sans, 'DM Sans', sans-serif);
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--ink-mid);
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.btn-ghost:hover {
+  color: var(--ink);
+}
+
+/* ─── Cards ──────────────────────────────────────────────────────────────── */
+.float-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.07);
+}
+
+.feature-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+}
+
+.feature-card:hover {
+  border-color: var(--orange);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.07);
+  transform: translateY(-4px);
+}
+
+/* ─── Pill badges ────────────────────────────────────────────────────────── */
+.pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-family: var(--font-dm-sans, 'DM Sans', sans-serif);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pill-badge-outline {
+  border: 1px solid var(--border);
+  color: var(--ink-mid);
+}
+
+.pill-badge-live {
+  background: rgba(232, 79, 39, 0.08);
+  color: var(--orange);
+}
+
+/* ─── Intensity bar ─────────────────────────────────────────────────────── */
+.intensity-track {
+  width: 100%;
+  height: 3px;
+  background: var(--border);
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.intensity-fill {
+  height: 100%;
+  background: var(--orange);
+  border-radius: 100px;
+  transition: width 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* ─── Nav ────────────────────────────────────────────────────────────────── */
+.nav-link {
+  font-family: var(--font-dm-sans, 'DM Sans', sans-serif);
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--ink-mid);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.nav-link:hover {
+  color: var(--orange);
+}
+
+/* ─── Footer ─────────────────────────────────────────────────────────────── */
+.footer-band {
+  border-top: 1px solid var(--border);
+  padding: 28px 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@media (max-width: 640px) {
+  .footer-band {
+    padding: 28px 24px;
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+}
+
+/* ─── Shimmer skeleton ───────────────────────────────────────────────────── */
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(90deg, var(--border) 0%, var(--card-bg) 50%, var(--border) 100%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+/* ─── Wordmark ───────────────────────────────────────────────────────────── */
+.wordmark {
+  font-family: var(--font-fraunces, 'Fraunces', Georgia, serif);
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+
+.wordmark .accent {
+  color: var(--orange);
+}
+
+/* ─── Form inputs ────────────────────────────────────────────────────────── */
+.site-input {
+  width: 100%;
+  padding: 14px 16px;
+  font-family: var(--font-dm-sans, 'DM Sans', sans-serif);
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--ink);
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.site-input::placeholder {
+  color: var(--ink-faint);
+}
+
+.site-input:focus {
+  border-color: var(--ink);
 }

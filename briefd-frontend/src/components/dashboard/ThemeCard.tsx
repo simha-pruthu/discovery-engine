@@ -1,4 +1,7 @@
-import IntensityBar from "@/components/ui/IntensityBar";
+"use client";
+
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
 export interface Quote {
   text: string;
@@ -15,15 +18,6 @@ export interface Theme {
   primary_segment: string;
   quotes?: Quote[];
   confidence?: string;
-}
-
-function getConfidenceStyles(level: string) {
-  const normalized = level.toLowerCase();
-  if (normalized === "high")
-    return "bg-emerald-50 text-emerald-700 border-emerald-200";
-  if (normalized === "medium")
-    return "bg-amber-50 text-amber-700 border-amber-200";
-  return "bg-slate-100 text-slate-600 border-slate-200";
 }
 
 function deriveConfidence(intensity: number): string {
@@ -43,55 +37,126 @@ function formatSource(source: string): string {
   return map[source.toLowerCase()] ?? source;
 }
 
+function IntensityBarAnimated({ value }: { value: number }) {
+  const [width, setWidth] = useState(0);
+
+  useEffect(() => {
+    const t = setTimeout(() => setWidth(value), 150);
+    return () => clearTimeout(t);
+  }, [value]);
+
+  return (
+    <div className="intensity-track">
+      <div className="intensity-fill" style={{ width: `${width}%` }} />
+    </div>
+  );
+}
+
 export default function ThemeCard({ theme }: { theme: Theme }) {
-  const confidence =
-    theme.confidence ?? deriveConfidence(theme.emotional_intensity);
+  const confidence = theme.confidence ?? deriveConfidence(theme.emotional_intensity);
   const quotes = theme.quotes?.slice(0, 2) ?? [];
 
   return (
-    <div className="bg-white border border-[#E2E8F0] rounded-xl p-8 shadow-sm hover:border-slate-300 hover:shadow-md transition-all duration-200">
-      {/* Header row */}
-      <div className="flex justify-between items-start mb-5">
+    <div
+      style={{
+        background: "var(--white)",
+        border: "1px solid var(--border)",
+        borderRadius: 14,
+        padding: "28px 28px",
+        transition: "border-color 0.25s, box-shadow 0.25s",
+        cursor: "default",
+      }}
+      onMouseEnter={(e) => {
+        const el = e.currentTarget as HTMLElement;
+        el.style.borderColor = "var(--orange)";
+        el.style.boxShadow = "0 12px 32px rgba(0,0,0,0.07)";
+      }}
+      onMouseLeave={(e) => {
+        const el = e.currentTarget as HTMLElement;
+        el.style.borderColor = "var(--border)";
+        el.style.boxShadow = "none";
+      }}
+    >
+      {/* Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
         <div>
-          <h3 className="text-base font-semibold text-[#0F172A]">
+          <h3 className="card-heading" style={{ fontSize: "1.1rem", marginBottom: 4 }}>
             {theme.name}
           </h3>
-          <p className="text-xs text-[#64748B] mt-1">{theme.primary_segment}</p>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.75rem", color: "var(--ink-faint)" }}>
+            {theme.primary_segment}
+          </p>
         </div>
-        <div className="text-right shrink-0 ml-6">
-          <p className="text-3xl font-semibold tabular-nums text-[#0F172A] leading-none">
+        <div style={{ textAlign: "right", flexShrink: 0, marginLeft: 16 }}>
+          <p
+            style={{
+              fontFamily: "'Fraunces', serif",
+              fontSize: "2rem",
+              fontWeight: 600,
+              letterSpacing: "-0.03em",
+              color: "var(--ink)",
+              lineHeight: 1,
+            }}
+          >
             {theme.frequency.toLocaleString()}
           </p>
-          <p className="text-xs text-[#64748B] uppercase tracking-wide mt-1">
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.68rem", color: "var(--ink-faint)", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: 2 }}>
             Signals
           </p>
         </div>
       </div>
 
       {/* Intensity bar */}
-      <IntensityBar value={theme.emotional_intensity} />
-      <p className="text-xs text-[#64748B] mt-2 mb-5">
-        Emotional intensity: {theme.emotional_intensity}%
-      </p>
+      <div style={{ marginBottom: 6 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.75rem", color: "var(--ink-faint)" }}>
+            Emotional Intensity
+          </span>
+          <span
+            style={{
+              fontFamily: "'Fraunces', serif",
+              fontWeight: 600,
+              fontSize: "0.9rem",
+              color: "var(--orange)",
+            }}
+          >
+            {theme.emotional_intensity}%
+          </span>
+        </div>
+        <IntensityBarAnimated value={theme.emotional_intensity} />
+      </div>
 
-      {/* Citations */}
+      {/* Quotes */}
       {quotes.length > 0 && (
-        <div>
-          <p className="text-xs uppercase tracking-wider text-[#64748B] font-medium mb-3">
+        <div style={{ marginTop: 20 }}>
+          <p
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: "0.68rem",
+              fontWeight: 500,
+              textTransform: "uppercase",
+              letterSpacing: "0.12em",
+              color: "var(--ink-faint)",
+              marginBottom: 12,
+            }}
+          >
             Citations
           </p>
-          <div className="space-y-4">
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {quotes.map((q, i) => (
               <div
                 key={i}
-                className="border-l-2 border-[#E2E8F0] pl-3"
+                style={{
+                  borderLeft: "2px solid var(--border)",
+                  paddingLeft: 12,
+                }}
               >
-                <p className="text-sm text-[#64748B] leading-relaxed mb-1.5">
+                <p className="body-copy" style={{ marginBottom: 6 }}>
                   &ldquo;{q.text}&rdquo;
                 </p>
-                <div className="flex items-center gap-3">
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   {q.source && (
-                    <span className="text-xs text-[#A0AEC0] font-medium">
+                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.72rem", color: "var(--ink-faint)", fontWeight: 500 }}>
                       {formatSource(q.source)}
                     </span>
                   )}
@@ -100,7 +165,16 @@ export default function ThemeCard({ theme }: { theme: Theme }) {
                       href={q.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs text-[#64748B] underline underline-offset-2 hover:text-[#D14E17] transition"
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: "0.72rem",
+                        color: "var(--ink-mid)",
+                        textDecoration: "underline",
+                        textUnderlineOffset: 2,
+                        transition: "color 0.2s",
+                      }}
+                      onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--orange)")}
+                      onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--ink-mid)")}
                     >
                       View original →
                     </a>
@@ -113,14 +187,22 @@ export default function ThemeCard({ theme }: { theme: Theme }) {
       )}
 
       {/* Footer */}
-      <div className="flex items-center justify-between mt-5 pt-5 border-t border-[#E2E8F0]">
-        <p className="text-sm text-[#0F172A]">
-          Impact: High friction among {theme.primary_segment.toLowerCase()}.
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginTop: 20,
+          paddingTop: 20,
+          borderTop: "1px solid var(--border)",
+        }}
+      >
+        <p className="body-copy" style={{ margin: 0, fontSize: "0.8rem", color: "var(--ink)" }}>
+          High friction among {theme.primary_segment.toLowerCase()}.
         </p>
         <span
-          className={`shrink-0 ml-4 text-xs font-medium px-2.5 py-1 rounded-full border capitalize ${getConfidenceStyles(
-            confidence
-          )}`}
+          className="pill-badge pill-badge-outline"
+          style={{ flexShrink: 0, marginLeft: 12 }}
         >
           {confidence}
         </span>

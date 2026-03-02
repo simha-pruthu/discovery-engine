@@ -6,9 +6,10 @@ interface KPIBlockProps {
   label: string;
   value: number;
   suffix?: string;
+  accent?: boolean;
 }
 
-function useCountUp(target: number, duration = 1200) {
+function useCountUp(target: number, duration = 1400) {
   const [count, setCount] = useState(0);
   const started = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -22,7 +23,6 @@ function useCountUp(target: number, duration = 1200) {
         if (entry.isIntersecting && !started.current) {
           started.current = true;
           const startTime = performance.now();
-
           const step = (now: number) => {
             const elapsed = now - startTime;
             const progress = Math.min(elapsed / duration, 1);
@@ -30,7 +30,6 @@ function useCountUp(target: number, duration = 1200) {
             setCount(Math.round(eased * target));
             if (progress < 1) requestAnimationFrame(step);
           };
-
           requestAnimationFrame(step);
         }
       },
@@ -44,18 +43,40 @@ function useCountUp(target: number, duration = 1200) {
   return { count, containerRef };
 }
 
-export default function KPIBlock({ label, value, suffix = "" }: KPIBlockProps) {
+export default function KPIBlock({ label, value, suffix = "", accent = false }: KPIBlockProps) {
   const { count, containerRef } = useCountUp(value);
 
   return (
     <div
       ref={containerRef}
-      className="bg-white border border-[#E2E8F0] rounded-xl p-8 shadow-sm"
+      style={{
+        padding: "28px 24px",
+        background: "var(--bg)",
+      }}
     >
-      <p className="text-xs uppercase tracking-wider text-[#64748B] font-medium mb-3">
+      <p
+        style={{
+          fontFamily: "'DM Sans', sans-serif",
+          fontSize: "0.72rem",
+          fontWeight: 500,
+          textTransform: "uppercase",
+          letterSpacing: "0.14em",
+          color: "var(--ink-faint)",
+          marginBottom: 12,
+        }}
+      >
         {label}
       </p>
-      <p className="text-4xl font-semibold tabular-nums text-[#0F172A]">
+      <p
+        style={{
+          fontFamily: "'Fraunces', serif",
+          fontSize: "2.5rem",
+          fontWeight: 600,
+          letterSpacing: "-0.04em",
+          lineHeight: 1,
+          color: accent ? "var(--orange)" : "var(--ink)",
+        }}
+      >
         {count.toLocaleString()}
         {suffix}
       </p>

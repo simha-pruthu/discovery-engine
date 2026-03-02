@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 import KPIBlock from "@/components/dashboard/KPIBlock";
 import ThemeCard from "@/components/dashboard/ThemeCard";
 import InsightPanel from "@/components/dashboard/InsightPanel";
-import HypothesisLab from "@/components/dashboard/HypothesisLab";
 import CompetitiveAnalysis from "@/components/dashboard/CompetitiveAnalysis";
-import type { Competitor } from "@/components/dashboard/CompetitiveAnalysis";
+import HypothesisLab from "@/components/dashboard/HypothesisLab";
 
 interface Quote {
   text: string;
@@ -37,6 +38,14 @@ interface ProductData {
   summary: Summary;
 }
 
+interface Competitor {
+  name: string;
+  negative_rate: number;
+  shared: string[];
+  unique_to_product: string[];
+  unique_to_competitor: string[];
+}
+
 interface ApiResponse {
   product: ProductData;
   competitors: Competitor[];
@@ -44,8 +53,18 @@ interface ApiResponse {
 
 type Status = "idle" | "loading" | "success" | "error";
 
-export default function DashboardPage() {
-  const [productInput, setProductInput] = useState("Notion");
+// Shimmer skeleton block
+function Skeleton({ height = 80, radius = 8 }: { height?: number; radius?: number }) {
+  return (
+    <div
+      className="skeleton-shimmer"
+      style={{ height, borderRadius: radius }}
+    />
+  );
+}
+
+export default function ExperiencePage() {
+  const [productInput, setProductInput] = useState("");
   const [competitorsInput, setCompetitorsInput] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [data, setData] = useState<ProductData | null>(null);
@@ -80,7 +99,7 @@ export default function DashboardPage() {
             const body = await res.json();
             if (body.error) msg = body.error;
           } catch {
-            // body wasn't JSON — keep the status message
+            // body wasn't JSON
           }
           throw new Error(msg);
         }
@@ -88,9 +107,7 @@ export default function DashboardPage() {
       })
       .then((json: ApiResponse) => {
         if (!json?.product?.themes || !json?.product?.summary) {
-          throw new Error(
-            "Unexpected response shape. Check the backend terminal for errors."
-          );
+          throw new Error("Unexpected response shape. Check the backend terminal.");
         }
         setData(json.product);
         setCompetitors(json.competitors ?? []);
@@ -107,9 +124,7 @@ export default function DashboardPage() {
         setStatus("success");
       })
       .catch((err: Error) => {
-        setErrorMsg(
-          err.message || "Analysis failed. Check the backend terminal for details."
-        );
+        setErrorMsg(err.message || "Analysis failed. Check the backend terminal.");
         setStatus("error");
       });
   }
@@ -122,180 +137,265 @@ export default function DashboardPage() {
         )
       : 0;
 
+  const canRun = productInput.trim().length > 0;
+
   return (
     <>
       <Navbar />
 
-      <div className="bg-[#F8F9FA] min-h-screen">
-        <div className="max-w-[1200px] mx-auto px-8">
+      <main style={{ minHeight: "100vh", paddingTop: 80 }}>
+        <div className="container-site" style={{ paddingTop: 48, paddingBottom: 80 }}>
 
-          {/* ── Report Header ───────────────────────────────────────── */}
-          <div className="py-10 border-b border-[#E2E8F0]">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-wider text-[#64748B] font-medium mb-1">
-                  Intelligence Report
-                </p>
-                <h1 className="text-2xl font-semibold text-[#0F172A]">
-                  {analysisProduct || "—"}
-                </h1>
-                {timestamp && (
-                  <p className="text-xs text-[#64748B] mt-1">{timestamp}</p>
-                )}
-              </div>
-
-              {status === "success" && (
-                <span className="flex items-center gap-1.5 text-xs font-medium text-emerald-600 bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-full mt-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 live-pulse inline-block" />
-                  LIVE
-                </span>
-              )}
-            </div>
+          {/* Page label */}
+          <div className="eyebrow-group" style={{ marginBottom: 32 }}>
+            <span className="eyebrow-dash" />
+            <span className="eyebrow">Intelligence Report</span>
           </div>
 
-          {/* ── Input Card ──────────────────────────────────────────── */}
-          <div className="py-8 border-b border-[#E2E8F0]">
-            <div className="bg-white border border-[#E2E8F0] rounded-xl p-8 shadow-sm">
-              <div className="grid md:grid-cols-[1fr_1fr_auto] gap-4 items-end">
-                <div>
-                  <label className="block text-xs uppercase tracking-wider text-[#64748B] font-medium mb-2">
-                    Product Name
-                  </label>
-                  <input
-                    type="text"
-                    value={productInput}
-                    onChange={(e) => setProductInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") runAnalysis();
-                    }}
-                    placeholder="e.g. Notion"
-                    disabled={status === "loading"}
-                    className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg text-sm text-[#0F172A] placeholder-[#A0AEC0] focus:outline-none focus:border-[#D14E17] transition bg-white disabled:opacity-60"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs uppercase tracking-wider text-[#64748B] font-medium mb-2">
-                    Competitors{" "}
-                    <span className="normal-case text-[#A0AEC0] tracking-normal">
-                      (optional, comma-separated)
-                    </span>
-                  </label>
-                  <input
-                    type="text"
-                    value={competitorsInput}
-                    onChange={(e) => setCompetitorsInput(e.target.value)}
-                    placeholder="e.g. Obsidian, Coda"
-                    disabled={status === "loading"}
-                    className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg text-sm text-[#0F172A] placeholder-[#A0AEC0] focus:outline-none focus:border-[#D14E17] transition bg-white disabled:opacity-60"
-                  />
-                </div>
-
-                <button
-                  onClick={runAnalysis}
-                  disabled={status === "loading" || !productInput.trim()}
-                  className="px-6 py-2.5 bg-[#D14E17] text-white rounded-lg text-sm font-medium hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-                >
-                  {status === "loading" ? "Running…" : "Run Analysis"}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* ── Idle ────────────────────────────────────────────────── */}
-          {status === "idle" && (
-            <div className="py-28 text-center">
-              <p className="text-sm text-[#64748B]">
-                Enter a product name to begin analysis.
-              </p>
-            </div>
-          )}
-
-          {/* ── Loading ─────────────────────────────────────────────── */}
-          {status === "loading" && (
-            <div className="py-28 flex flex-col items-center gap-4">
-              <div className="w-8 h-8 border-2 border-[#D14E17] border-t-transparent rounded-full animate-spin" />
-              <p className="text-sm text-[#64748B]">Running analysis&hellip;</p>
-              <p className="text-xs text-[#A0AEC0]">
-                Collecting signals, classifying, and clustering themes.
-                This typically takes 1–2 minutes.
-              </p>
-            </div>
-          )}
-
-          {/* ── Error ───────────────────────────────────────────────── */}
-          {status === "error" && (
-            <div className="py-28 text-center">
-              <p className="text-sm text-[#64748B]">{errorMsg}</p>
-              <button
-                onClick={runAnalysis}
-                className="mt-4 px-5 py-2 border border-[#E2E8F0] rounded-lg text-xs font-medium text-[#0F172A] hover:bg-white transition"
+          {/* ── Form Card ───────────────────────────────────────────────── */}
+          <div
+            className="float-card"
+            style={{
+              padding: 40,
+              maxWidth: 600,
+              marginBottom: status !== "idle" ? 48 : 0,
+            }}
+          >
+            {/* Product Name */}
+            <div style={{ marginBottom: 24 }}>
+              <label
+                style={{
+                  display: "block",
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: "0.72rem",
+                  fontWeight: 500,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.14em",
+                  color: "var(--ink-faint)",
+                  marginBottom: 8,
+                }}
               >
+                Product Name
+              </label>
+              <input
+                type="text"
+                value={productInput}
+                onChange={(e) => setProductInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") runAnalysis(); }}
+                placeholder="e.g. Notion, Figma, Linear"
+                disabled={status === "loading"}
+                className="site-input"
+              />
+            </div>
+
+            {/* Competitors */}
+            <div style={{ marginBottom: 32 }}>
+              <label
+                style={{
+                  display: "block",
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: "0.72rem",
+                  fontWeight: 500,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.14em",
+                  color: "var(--ink-faint)",
+                  marginBottom: 8,
+                }}
+              >
+                Competitors{" "}
+                <span
+                  style={{
+                    textTransform: "none",
+                    letterSpacing: "normal",
+                    fontWeight: 400,
+                    color: "var(--ink-faint)",
+                    opacity: 0.7,
+                  }}
+                >
+                  (optional, comma-separated)
+                </span>
+              </label>
+              <input
+                type="text"
+                value={competitorsInput}
+                onChange={(e) => setCompetitorsInput(e.target.value)}
+                placeholder="e.g. Obsidian, Coda"
+                disabled={status === "loading"}
+                className="site-input"
+              />
+            </div>
+
+            {/* Submit */}
+            <button
+              onClick={runAnalysis}
+              disabled={!canRun || status === "loading"}
+              className="btn-primary"
+              style={{ width: "100%", justifyContent: "center" }}
+            >
+              {status === "loading" ? "Running…" : "Run Analysis"}
+            </button>
+          </div>
+
+          {/* ── Loading skeletons ─────────────────────────────────────── */}
+          {status === "loading" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <p
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: "0.85rem",
+                  color: "var(--ink-faint)",
+                  marginBottom: 8,
+                }}
+              >
+                Collecting signals, clustering themes…
+              </p>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 1, background: "var(--border)", borderRadius: 12, overflow: "hidden" }}>
+                {[0,1,2,3].map(i => (
+                  <div key={i} style={{ padding: 24, background: "var(--bg)" }}>
+                    <Skeleton height={18} radius={4} />
+                    <div style={{ marginTop: 12 }}><Skeleton height={36} radius={4} /></div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {[0,1,2].map(i => (
+                  <Skeleton key={i} height={120} radius={14} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ── Error ────────────────────────────────────────────────── */}
+          {status === "error" && (
+            <div
+              style={{
+                padding: "40px",
+                textAlign: "center",
+                border: "1px solid var(--border)",
+                borderRadius: 14,
+                background: "var(--white)",
+              }}
+            >
+              <p className="body-copy" style={{ marginBottom: 16 }}>{errorMsg}</p>
+              <button onClick={runAnalysis} className="btn-ink">
                 Retry
               </button>
             </div>
           )}
 
-          {/* ── Results ─────────────────────────────────────────────── */}
-          {status === "success" && data && (
-            <>
-              {/* 1. KPI Row */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 py-10 border-b border-[#E2E8F0]">
-                <KPIBlock
-                  label="Total Signals"
-                  value={data.summary.total_signals}
-                />
-                <KPIBlock
-                  label="Negative Rate"
-                  value={Math.round(data.summary.negative_rate)}
-                  suffix="%"
-                />
-                <KPIBlock
-                  label="Themes Identified"
-                  value={data.themes.length}
-                />
-                <KPIBlock
-                  label="Avg Intensity"
-                  value={avgIntensity}
-                  suffix="%"
-                />
-              </div>
+          {/* ── Results ──────────────────────────────────────────────── */}
+          <AnimatePresence>
+            {status === "success" && data && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                {/* Results header */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginBottom: 32,
+                    paddingBottom: 24,
+                    borderBottom: "1px solid var(--border)",
+                  }}
+                >
+                  <div>
+                    <h1
+                      className="card-heading"
+                      style={{ fontSize: "1.5rem", marginBottom: 4 }}
+                    >
+                      {analysisProduct}
+                    </h1>
+                    {timestamp && (
+                      <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.75rem", color: "var(--ink-faint)" }}>
+                        {timestamp}
+                      </p>
+                    )}
+                  </div>
 
-              {/* 2. Theme Cards + Insight Panel */}
-              <div className="grid md:grid-cols-5 gap-8 py-10 border-b border-[#E2E8F0]">
-                <div className="md:col-span-3 space-y-6">
-                  {data.themes.map((t, i) => (
-                    <ThemeCard key={i} theme={t} />
-                  ))}
+                  <span className="pill-badge pill-badge-live" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <motion.span
+                      style={{ display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: "var(--orange)" }}
+                      animate={{ scale: [1, 0.8], opacity: [1, 0.5] }}
+                      transition={{ duration: 1.8, repeat: Infinity, repeatType: "reverse" }}
+                    />
+                    LIVE
+                  </span>
                 </div>
 
-                <div className="md:col-span-2">
-                  <InsightPanel
-                    summary={data.summary}
-                    themes={data.themes}
-                    productName={analysisProduct}
+                {/* KPI grid */}
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(4, 1fr)",
+                    gap: 1,
+                    background: "var(--border)",
+                    border: "1px solid var(--border)",
+                    borderRadius: 14,
+                    overflow: "hidden",
+                    marginBottom: 48,
+                  }}
+                >
+                  <KPIBlock label="Total Signals" value={data.summary.total_signals} />
+                  <KPIBlock label="Negative Rate" value={Math.round(data.summary.negative_rate)} suffix="%" accent />
+                  <KPIBlock label="Themes Identified" value={data.themes.length} />
+                  <KPIBlock label="Avg Intensity" value={avgIntensity} suffix="%" accent />
+                </div>
+
+                {/* Themes + sidebar */}
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 320px",
+                    gap: 32,
+                    alignItems: "start",
+                  }}
+                >
+                  <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                    {data.themes.map((t, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: i * 0.07 }}
+                      >
+                        <ThemeCard theme={t} />
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  <div style={{ position: "sticky", top: 80 }}>
+                    <InsightPanel
+                      summary={data.summary}
+                      themes={data.themes}
+                      productName={analysisProduct}
+                      competitors={competitors}
+                    />
+                  </div>
+                </div>
+
+                {/* Competitive Analysis */}
+                {competitors.length > 0 && (
+                  <CompetitiveAnalysis
                     competitors={competitors}
+                    productName={analysisProduct}
                   />
-                </div>
-              </div>
+                )}
 
-              {/* 3. Competitive Analysis (only when competitors present) */}
-              {competitors.length > 0 && (
-                <CompetitiveAnalysis
-                  competitors={competitors}
-                  productName={analysisProduct}
-                />
-              )}
-
-              {/* 4. Hypothesis Lab */}
-              <div className="pb-16">
+                {/* Hypothesis Lab */}
                 <HypothesisLab themes={data.themes} />
-              </div>
-            </>
-          )}
+
+              </motion.div>
+            )}
+          </AnimatePresence>
 
         </div>
-      </div>
+      </main>
+
+      <Footer />
     </>
   );
 }
