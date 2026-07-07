@@ -40,7 +40,7 @@ export default function Navbar() {
       >
         {/* Wordmark */}
         <Link href="/" className="wordmark">
-          Brief<span className="accent">·ed</span>
+          Brief<span className="accent">d</span>
         </Link>
 
         {/* Centre links — desktop only */}

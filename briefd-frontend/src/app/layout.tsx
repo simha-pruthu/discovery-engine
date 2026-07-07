@@ -14,9 +14,9 @@ const fraunces = Fraunces({
 });
 
 export const metadata = {
-  title: "Briefed — Product Intelligence Platform",
+  title: "Briefd — Product Intelligence Platform",
   description:
-    "Turn raw feedback into ranked product decisions. Briefed transforms scattered reviews, forum threads, and user complaints into structured friction themes with measurable severity scoring.",
+    "Turn raw feedback into ranked product decisions. Briefd transforms scattered reviews, forum threads, and user complaints into structured friction themes with measurable severity scoring.",
 };
 
 export default function RootLayout({

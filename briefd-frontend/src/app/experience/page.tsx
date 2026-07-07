@@ -47,8 +47,11 @@ interface Competitor {
 }
 
 interface ApiResponse {
-  product: ProductData;
-  competitors: Competitor[];
+  category?: string;
+  product?: ProductData;
+  competitors?: Competitor[];
+  insufficient_data?: boolean;
+  message?: string;
 }
 
 type Status = "idle" | "loading" | "success" | "error";
@@ -70,6 +73,7 @@ export default function ExperiencePage() {
   const [data, setData] = useState<ProductData | null>(null);
   const [competitors, setCompetitors] = useState<Competitor[]>([]);
   const [analysisProduct, setAnalysisProduct] = useState("");
+  const [category, setCategory] = useState("");
   const [timestamp, setTimestamp] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -80,6 +84,7 @@ export default function ExperiencePage() {
     setStatus("loading");
     setData(null);
     setCompetitors([]);
+    setCategory("");
     setErrorMsg("");
 
     const competitorList = competitorsInput
@@ -106,11 +111,17 @@ export default function ExperiencePage() {
         return res.json();
       })
       .then((json: ApiResponse) => {
+        if (json.insufficient_data) {
+          throw new Error(
+            json.message || "Not enough public review signals to generate reliable insights."
+          );
+        }
         if (!json?.product?.themes || !json?.product?.summary) {
           throw new Error("Unexpected response shape. Check the backend terminal.");
         }
         setData(json.product);
         setCompetitors(json.competitors ?? []);
+        setCategory(json.category ?? "");
         setAnalysisProduct(product);
         setTimestamp(
           new Date().toLocaleString("en-US", {
@@ -303,6 +314,21 @@ export default function ExperiencePage() {
                   }}
                 >
                   <div>
+                    {category && (
+                      <span
+                        className="pill-badge-outline"
+                        style={{
+                          display: "inline-block",
+                          marginBottom: 8,
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontSize: "0.68rem",
+                          letterSpacing: "0.1em",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        {category}
+                      </span>
+                    )}
                     <h1
                       className="card-heading"
                       style={{ fontSize: "1.5rem", marginBottom: 4 }}

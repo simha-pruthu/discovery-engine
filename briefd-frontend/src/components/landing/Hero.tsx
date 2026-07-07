@@ -451,7 +451,7 @@ export default function Hero() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.55, delay: 1.2 }}
               >
-                Briefed transforms scattered reviews, forum threads, and user complaints
+                Briefd transforms scattered reviews, forum threads, and user complaints
                 into structured friction themes — with measurable severity scoring and
                 segment-level impact analysis.
               </motion.p>

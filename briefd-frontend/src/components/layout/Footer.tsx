@@ -4,7 +4,7 @@ export default function Footer() {
   return (
     <footer className="footer-band">
       <Link href="/" className="wordmark" style={{ fontSize: "0.78rem", color: "var(--ink-faint)" }}>
-        Brief<span className="accent">·ed</span>
+        Brief<span className="accent">d</span>
       </Link>
       <p
         style={{
@@ -13,7 +13,7 @@ export default function Footer() {
           color: "var(--ink-faint)",
         }}
       >
-        © 2026 Briefed — Pruthu Simha. All rights reserved.
+        © 2026 Briefd — Pruthu Simha. All rights reserved.
       </p>
     </footer>
   );

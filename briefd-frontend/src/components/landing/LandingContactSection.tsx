@@ -1,9 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
+import ContactModal from "@/components/ui/ContactModal";
 
 export default function LandingContactSection() {
+  const [modalOpen, setModalOpen] = useState(false);
   return (
+    <>
     <section
       style={{
         borderTop: "1px solid var(--border)",
@@ -69,11 +73,15 @@ export default function LandingContactSection() {
           transition={{ duration: 0.5, ease: "easeOut", delay: 0.24 }}
           viewport={{ once: true, margin: "-80px" }}
         >
-          <a href="mailto:pruthu@example.com" className="btn-primary">
+          <button
+            type="button"
+            className="btn-primary"
+            onClick={() => setModalOpen(true)}
+          >
             Get in touch
-          </a>
+          </button>
           <a
-            href="https://linkedin.com"
+            href="https://www.linkedin.com/in/pruthu-simha/"
             target="_blank"
             rel="noopener noreferrer"
             className="btn-ghost"
@@ -90,5 +98,8 @@ export default function LandingContactSection() {
         </motion.div>
       </div>
     </section>
+
+    <ContactModal open={modalOpen} onClose={() => setModalOpen(false)} />
+    </>
   );
 }

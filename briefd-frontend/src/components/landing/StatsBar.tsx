@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 const stats = [
-  { value: 847, suffix: "", label: "Signals processed per analysis" },
+  { value: 1, suffix: ".2M +", label: "Signals processed per analysis" },
   { value: 84, suffix: "%", label: "Average emotional intensity on top themes" },
   { value: 3, suffix: "×", label: "Faster than manual review" },
 ];

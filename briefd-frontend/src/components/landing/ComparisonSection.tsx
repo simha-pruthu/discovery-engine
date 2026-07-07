@@ -107,7 +107,7 @@ export default function ComparisonSection() {
             </ul>
           </motion.div>
 
-          {/* Right — Briefed */}
+          {/* Right — Briefd */}
           <motion.div
             style={{
               background: "var(--ink)",
@@ -131,7 +131,7 @@ export default function ComparisonSection() {
                 marginBottom: 28,
               }}
             >
-              Briefed
+              Briefd
             </p>
             <ul style={{ display: "flex", flexDirection: "column", gap: 18 }}>
               {briefedItems.map((item, i) => (

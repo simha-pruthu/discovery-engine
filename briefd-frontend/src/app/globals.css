@@ -361,3 +361,39 @@ body {
 .site-input:focus {
   border-color: var(--ink);
 }
+
+/* ─── Select dropdown (used in ContactModal) ─────────────────────────────── */
+.site-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%23A8A5A0' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 40px;
+  cursor: pointer;
+}
+
+/* ─── Modal close button ─────────────────────────────────────────────────── */
+.modal-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--ink-mid);
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+  transition: border-color 0.2s, color 0.2s;
+  font-family: var(--font-dm-sans, 'DM Sans', sans-serif);
+}
+
+.modal-close-btn:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}

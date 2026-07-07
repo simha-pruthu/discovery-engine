@@ -460,7 +460,7 @@ async function downloadAnalysisPDF(
     doc.setFont("helvetica", "normal");
     doc.setFontSize(7);
     doc.setTextColor(100, 116, 139);
-    doc.text("Briefed — Product Intelligence", ml, pageH - 10);
+    doc.text("Briefd — Product Intelligence", ml, pageH - 10);
     doc.text(`Page ${p} of ${totalPages}`, pageW - mr, pageH - 10, {
       align: "right",
     });
