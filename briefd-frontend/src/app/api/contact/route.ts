@@ -1,6 +1,8 @@
 // Proxy route: forwards contact form submissions to FastAPI /contact
 // Mirrors the pattern used in /api/analyze/route.ts
 
+const BACKEND_URL = process.env.BACKEND_URL ?? "http://127.0.0.1:8000";
+
 export async function POST(request: Request) {
   let body: unknown;
   try {
@@ -10,7 +12,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const response = await fetch("http://127.0.0.1:8000/contact", {
+    const response = await fetch(`${BACKEND_URL}/contact`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),

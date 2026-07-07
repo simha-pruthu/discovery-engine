@@ -1,6 +1,8 @@
 // Allow up to 2 minutes for the scraping + Claude pipeline
 export const maxDuration = 120;
 
+const BACKEND_URL = process.env.BACKEND_URL ?? "http://127.0.0.1:8000";
+
 interface RawTheme {
   name: string;
   frequency: number;
@@ -21,7 +23,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const response = await fetch("http://127.0.0.1:8000/analyze", {
+    const response = await fetch(`${BACKEND_URL}/analyze`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
